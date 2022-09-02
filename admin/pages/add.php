@@ -5,16 +5,10 @@ include '../functions/article.php';
 $article = new Article();
 $rows = $article->joinCategory();
 
-if (isset($_POST['article-btn-add'])) {
-    echo $_FILES['article-input-picture']['name'];
-    // $article->insert([
-    //     $_POST['article-input-title'],
-    //     $_POST['article-input-detail'],
-    //     /* picture */
-    //     $_POST['article-select-category']
-    // ]);
-}
 
+if (isset($_POST['article-btn-add'])) {
+    echo $_POST['article-input-title'];
+}
 
 ?>
 <!DOCTYPE html>
@@ -44,6 +38,21 @@ if (isset($_POST['article-btn-add'])) {
                     <div class="row mb-2">
                         <div class="col-sm-6">
                             <h1 class="m-0">เพิ่มบทความ</h1>
+                            <?php if (isset($_POST['article-btn-add'])) {
+                                $title = $_POST['article-input-title'];
+                                $detail = $_POST['article-input-detail'];
+                                $category_id = $_POST['article-select-category'];
+                                $type = strrchr($_FILES['article-input-picture']['name'], ".");
+                                $filename = date("YmdHs") . $type;
+                                if (empty($title) || empty($detail) || empty($category_id || empty($type))) {
+                                    return $msg_err = 'Please enter all field';
+                                }
+                                if(move_uploaded_file($_FILES['article-input-picture']['tmp_name'], "./images/article/$filename")) {
+                                    if ($article->insert([$title, $detail, $filename, $category_id])) {
+                                        $msg_suc = 'Successfuly inserted';
+                                    }
+                                }
+                            } ?>
                         </div><!-- /.col -->
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -65,17 +74,23 @@ if (isset($_POST['article-btn-add'])) {
                         </div>
 
                         <div class="card-body">
+                            <?php if (isset($msg_err)) { ?>
+                                <div class="alert alert-danger" role="alert"><?php echo $msg_err ?></div>
+                            <?php } ?>
+                            <?php if (isset($msg_suc)) { ?>
+                                <div class="alert alert-success" role="alert"><?php echo $msg_suc ?></div>
+                            <?php } ?>
                             <div class="row">
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label for="exampleInputFile">Title</label>
-                                        <input type="text" name="article-input-title" class="form-control form-control-border border-width-2" id="exampleInputBorderWidth2" placeholder="Title">
+                                        <input type="text" require name="article-input-title" class="form-control form-control-border border-width-2" id="exampleInputBorderWidth2" placeholder="Title">
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label for="exampleSelectBorderWidth2">Categories Select</label>
-                                        <select class="custom-select form-control-border border-width-2" id="exampleSelectBorderWidth2" name="article-select-category">
+                                        <select require class="custom-select form-control-border border-width-2" id="exampleSelectBorderWidth2" name="article-select-category">
                                             <?php for ($i = 0; $i < count($rows); $i++) { ?>
                                                 <option value="<?= $rows[$i]['id'] ?>"><?= $rows[$i]['title'] ?></option>
                                             <?php  } ?>
@@ -85,7 +100,7 @@ if (isset($_POST['article-btn-add'])) {
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label for="summernote">Detail</label>
-                                        <textarea name="aritcle-input-detail" id="summernote"></textarea>
+                                        <textarea require name="article-input-detail" id="summernote"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-5">
@@ -93,24 +108,11 @@ if (isset($_POST['article-btn-add'])) {
                                         <label for="exampleInputFile">Picture</label>
                                         <div class="input-group">
                                             <div class="custom-file">
-                                                <input type="file" name="article-input-picture" class="custom-file-input" id="exampleInputFile">
+                                                <input require type="file" name="article-input-picture" class="custom-file-input" id="exampleInputFile">
                                                 <label class="custom-file-label" for="exampleInputFile">Choose file</label>
                                             </div>
                                         </div>
                                     </div>
-                                    <?php
-
-                                    if (isset($_POST['article-btn-add'])) {
-                                        echo $_FILES['article-input-detail']['name'];
-                                        echo $_FILES['article-input-picture']['type'];
-                                        // $article->insert([
-                                        //     $_POST['article-input-title'],
-                                        //     $_POST['article-input-detail'],
-                                        //     /* picture */
-                                        //     $_POST['article-select-category']
-                                        // ]);
-                                    }
-                                    ?>
                                 </div>
                             </div>
                         </div>
@@ -131,7 +133,18 @@ if (isset($_POST['article-btn-add'])) {
     <script>
         $(document).ready(function() {
             $('#summernote').summernote({
-                height: 200
+                placeholder: 'Hello stand alone ui',
+                tabsize: 2,
+                height: 120,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ]
             });
             bsCustomFileInput.init();
         });
