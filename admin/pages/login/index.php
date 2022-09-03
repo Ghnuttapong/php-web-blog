@@ -10,7 +10,9 @@
      if(!empty($user)){
           $msg_suc = "Logined Successfully";
           $_SESSION['username'] = $user['username'];
+          $_SESSION['profile-picture'] = $user['picture'];
           $_SESSION['fullname'] = $user['fullname'];
+          $_SESSION['password'] = $user['password'];
           header('refresh:2, url = ../index.php');
      }else {
           $msg_err = 'Username Invalid';
