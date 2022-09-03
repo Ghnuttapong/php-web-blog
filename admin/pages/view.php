@@ -1,4 +1,19 @@
 <?php include "./layouts/isadmin.php" ?>
+<?php
+
+include "../functions/article.php";
+$article = new Article();
+$rows = $article->getArticle();
+
+if (isset($_POST['article-btn-del'])) {
+    $id = $_POST['id'];
+    if ($article->deleteArticle($id)) {
+        $msg_suc = 'Successfully Deleted Article';
+        header('refresh: 0.5;');
+    }
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +21,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin | บทความ</title>
-
     <?php include "./layouts/css.php" ?>
 </head>
 
@@ -44,7 +58,6 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Category Details</h3>
-                        <button class="btn btn-primary float-right" data-toggle="modal" data-target="#exampleModal">เพิ่มหมวดหมู่</button>
                     </div>
                     <div class="card-body">
                         <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
@@ -54,10 +67,43 @@
                                         <thead>
                                             <tr>
                                                 <th class="sorting sorting_asc" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Title</th>
+                                                <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Picture</th>
+                                                <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Category</th>
                                                 <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Rating</th>
+                                                <th class="sorting" tabindex="0" aria-controls="example1" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="result">
+                                        <tbody>
+                                            <?php if (empty($rows)) { ?>
+                                                <td colspan="6" class="text-center">Not found data.</td>
+                                            <?php } else { ?>
+                                                <?php for ($i = 0; $i < count($rows); $i++) { ?>
+                                                    <tr>
+                                                        <td><?= $rows[$i]['title'] ?></td>
+                                                        <td>
+                                                            <img src="./images/article/<?= $rows[$i]['picture'] ?>"  height="60" alt="">
+                                                        </td>
+                                                        <td>
+                                                            <?php $data = $article->getCategoryName($rows[$i]['category_id']) ?>
+                                                            <?php echo $data['title'] ?>
+                                                        </td>
+                                                        <td><?= $rows[$i]['rating'] ?></td>
+                                                        <td>
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <a href="article-edit.php?id=<?= $rows[$i]['id'] ?>" class="btn btn-primary w-100">Edit</a>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <form action="" method="post">
+                                                                        <input type="hidden" name="id" value="<?= $rows[$i]['id'] ?>" id="">
+                                                                        <input onclick="return confirm('Do you want to delete <?= $rows[$i]['title'] ?>')" type="submit" value="Del" name="article-btn-del" class="btn btn-danger w-100">
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <?php } ?>
+                                            <?php } ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -83,6 +129,26 @@
                 "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         })
+
+        function confirmDel() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                    )
+                }
+            })
+        }
     </script>
 </body>
 

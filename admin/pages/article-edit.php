@@ -5,28 +5,26 @@ include '../functions/article.php';
 $article = new Article();
 $rows = $article->joinCategory();
 
+$id = $_GET['id'];
+$data = $article->getArticleOne($id);
 
-if (isset($_POST['article-btn-add'])) {
+if (isset($_POST['article-btn-update'])) {
     $title = $_POST['article-input-title'];
     $detail = $_POST['article-input-detail'];
     $category_id = $_POST['article-select-category'];
-    $type = strrchr($_FILES['article-input-picture']['name'], ".");
-    $filename = date("YmdHs") . $type;
-    if (empty($title)) {
-        $msg_err = 'Please enter title field';
-    }elseif(empty($detail)) {
-        $msg_err = 'Please enter detail field';
-    }elseif(empty($category_id) ){
-        $msg_err = 'Please enter all field';
-    }elseif(empty($type)) {
-        $msg_err = 'Please enter picture field';
-    }else {
+    if ($_FILES['article-input-picture']['name']) {
+        $type = strrchr($_FILES['article-input-picture']['name'], ".");
+        $filename = date("YmdHs") . $type;
         if (move_uploaded_file($_FILES['article-input-picture']['tmp_name'], "./images/article/$filename")) {
-            if ($article->insert([$title, $detail, $filename, $category_id])) {
-                $msg_suc = 'Successfuly inserted';
-            }
+            $article->updateArticle($title, $detail, $category_id, $filename, $id);
+            $msg_suc = 'updated successfully.';
+        }
+    } else {
+        if ($article->updateArticle($title, $detail, $category_id, null, $id)) {
+            $msg_suc = 'updated successfully.';
         }
     }
+    $msg_err = 'Failed updated.';
 }
 ?>
 <!DOCTYPE html>
@@ -55,12 +53,12 @@ if (isset($_POST['article-btn-add'])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">เพิ่มบทความ</h1>
+                            <h1 class="m-0">แก้ไขบทความ</h1>
                         </div><!-- /.col -->
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active">เพิ่มบทความ</li>
+                                <li class="breadcrumb-item active">แก้ไขบทความ</li>
                             </ol>
                         </div><!-- /.col -->
                     </div><!-- /.row -->
@@ -75,11 +73,7 @@ if (isset($_POST['article-btn-add'])) {
                         <div class="card-header">
                             <h3 class="card-title">Form artical</h3>
                         </div>
-
                         <div class="card-body">
-                            <?php if (isset($msg_err)) { ?>
-                                <div class="alert alert-danger" role="alert"><?php echo $msg_err ?></div>
-                            <?php } ?>
                             <?php if (isset($msg_suc)) { ?>
                                 <div class="alert alert-success" role="alert"><?php echo $msg_suc ?></div>
                             <?php } ?>
@@ -87,7 +81,7 @@ if (isset($_POST['article-btn-add'])) {
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label for="exampleInputFile">Title</label>
-                                        <input type="text" required name="article-input-title" class="form-control form-control-border border-width-2" id="exampleInputBorderWidth2" placeholder="Title">
+                                        <input type="text" value="<?= $data['title'] ?>" required name="article-input-title" class="form-control form-control-border border-width-2" id="exampleInputBorderWidth2" placeholder="Title">
                                     </div>
                                 </div>
                                 <div class="col-6">
@@ -95,7 +89,7 @@ if (isset($_POST['article-btn-add'])) {
                                         <label for="exampleSelectBorderWidth2">Categories Select</label>
                                         <select required class="custom-select form-control-border border-width-2" id="exampleSelectBorderWidth2" name="article-select-category">
                                             <?php for ($i = 0; $i < count($rows); $i++) { ?>
-                                                <option value="<?= $rows[$i]['id'] ?>"><?= $rows[$i]['title'] ?></option>
+                                                <option value="<?= $rows[$i]['id'] ?>" <?php echo $rows[$i]['id'] == $data['category_id'] ? 'selected' : '' ?>><?= $rows[$i]['title'] ?></option>
                                             <?php  } ?>
                                         </select>
                                     </div>
@@ -103,7 +97,7 @@ if (isset($_POST['article-btn-add'])) {
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label for="summernote">Detail</label>
-                                        <textarea required name="article-input-detail" id="summernote"></textarea>
+                                        <textarea required name="article-input-detail" id="summernote"><?= $data['detail'] ?></textarea>
                                     </div>
                                 </div>
                                 <div class="col-5">
@@ -111,16 +105,19 @@ if (isset($_POST['article-btn-add'])) {
                                         <label for="exampleInputFile">Picture</label>
                                         <div class="input-group">
                                             <div class="custom-file">
-                                                <input required type="file" name="article-input-picture" class="custom-file-input" id="exampleInputFile">
-                                                <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                                                <input type="file" accept=".jpg, .jpeg, .png" name="article-input-picture" class="custom-file-input">
+                                                <label class="custom-file-label" for="exampleInputFile"><?= $data['picture'] ?></label>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="text-center">
+                                        <img src="./images/article/<?= $data['picture'] ?>" width="auto" height="300" alt="">
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="card-footer">
-                            <input type="submit" name="article-btn-add" class="btn btn-success w-50 float-right" value="Save">
+                            <input type="submit" name="article-btn-update" class="btn btn-success w-50 float-right" value="Save">
                         </div>
                     </div>
                 </form>

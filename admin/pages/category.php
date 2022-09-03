@@ -13,6 +13,14 @@ if (isset($_POST['category-btn-add'])) {
     }
 }
 
+if (isset($_POST['category-btn-del'])) {
+    $id = $_POST['id'];
+    if($category->delete($id)) {
+        header('refresh: 1');
+        $msg_suc = 'Successfully Deleted';
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,8 +70,13 @@ if (isset($_POST['category-btn-add'])) {
 
                     <div class="card-body">
                         <?php if (isset($msg_err)) : ?>
-                            <div class="alert alert-secondary" role="alert">
-                                <?php $msg_err ?>
+                            <div class="alert alert-danger" role="alert">
+                                <?php echo $msg_err ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (isset($msg_suc)) : ?>
+                            <div class="alert alert-success" role="alert">
+                                <?php echo $msg_suc ?>
                             </div>
                         <?php endif; ?>
                         <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
@@ -81,13 +94,22 @@ if (isset($_POST['category-btn-add'])) {
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            <?php if (empty($rows)) { ?>
+                                                <td colspan="4" class="text-center">Not found data.</td>
+                                            <?php } else { ?>
                                             <?php for ($i = 0; $i < count($rows); $i++) { ?>
                                                 <tr>
                                                     <td><?php echo $i+1;  ?></td>
                                                     <td><?php echo $rows[$i]['title'];  ?></td>
                                                     <td><?php echo $rows[$i]['rating'];  ?></td>
-                                                    <td><?php echo $rows[$i]['id'];  ?></td>
+                                                    <td>
+                                                        <form action="" method="post" >
+                                                            <input type="hidden" name="id" value="<?= $rows[$i]['id'] ?>">
+                                                            <input type="submit" onclick="return confirm('Do you want delete to <?= $rows[$i]['title'] ?>')" value="Delete" class="btn btn-secondary w-100" name="category-btn-del">
+                                                        </form>
+                                                    </td>
                                                 </tr>
+                                            <?php  } ?>
                                             <?php  } ?>
                                         </tbody>
                                     </table>
