@@ -27,7 +27,7 @@ if (isset($_POST['article-btn-del'])) {
 <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
     <div class="wrapper">
 
-        <?php include "./layouts/preloader.php" ?>
+        <?php include dirname(__FILE__).'/layouts/preloader.php' ?>
 
         <?php include "./layouts/navbar.php" ?>
         <?php include "./layouts/sidebar.php" ?>
@@ -106,6 +106,7 @@ if (isset($_POST['article-btn-del'])) {
                                             <?php } ?>
                                         </tbody>
                                     </table>
+                                    <?php echo ip2long(192.168);  ?>
                                 </div>
                             </div>
                         </div>

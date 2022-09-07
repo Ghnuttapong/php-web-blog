@@ -14,6 +14,7 @@
           $_SESSION['fullname'] = $user['fullname'];
           $_SESSION['password'] = $user['password'];
           header('refresh:2, url = ../index.php');
+          die();
      }else {
           $msg_err = 'Username Invalid';
      }

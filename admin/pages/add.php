@@ -10,22 +10,23 @@ if (isset($_POST['article-btn-add'])) {
     $title = $_POST['article-input-title'];
     $detail = $_POST['article-input-detail'];
     $category_id = $_POST['article-select-category'];
-    $type = strrchr($_FILES['article-input-picture']['name'], ".");
-    $filename = date("YmdHs") . $type;
     if (empty($title)) {
         $msg_err = 'Please enter title field';
     }elseif(empty($detail)) {
         $msg_err = 'Please enter detail field';
     }elseif(empty($category_id) ){
         $msg_err = 'Please enter all field';
-    }elseif(empty($type)) {
-        $msg_err = 'Please enter picture field';
     }else {
-        if (move_uploaded_file($_FILES['article-input-picture']['tmp_name'], "./images/article/$filename")) {
-            if ($article->insert([$title, $detail, $filename, $category_id])) {
-                $msg_suc = 'Successfuly inserted';
+        $total = count($_FILES['article-input-picture']['name']);
+        for($i = 0; $i < $total; $i++) {
+            $type = strrchr($_FILES['article-input-picture']['name'][$i], ".");
+            $filename = date("YmdHs").rand(0,999). $type;
+            if (move_uploaded_file($_FILES['article-input-picture']['tmp_name'][$i], "./images/article/$filename")) {
+                if ($article->insert([$title, $detail, $filename, $category_id])) {
+                }
             }
         }
+        $msg_suc = 'Successfuly inserted';
     }
 }
 ?>
@@ -111,7 +112,7 @@ if (isset($_POST['article-btn-add'])) {
                                         <label for="exampleInputFile">Picture</label>
                                         <div class="input-group">
                                             <div class="custom-file">
-                                                <input required type="file" name="article-input-picture" class="custom-file-input" id="exampleInputFile">
+                                                <input required type="file" name="article-input-picture[]" class="custom-file-input" id="exampleInputFile">
                                                 <label class="custom-file-label" for="exampleInputFile">Choose file</label>
                                             </div>
                                         </div>

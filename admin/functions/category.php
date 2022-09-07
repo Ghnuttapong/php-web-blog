@@ -2,7 +2,7 @@
     include "db.php";
     class Category extends DB {
         public function getCategory() {
-            $sql = "SELECT * FROM category";
+            $sql = "SELECT * FROM category ORDER BY title DESC";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             $data = array();
