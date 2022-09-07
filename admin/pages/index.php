@@ -1,9 +1,12 @@
 <?php include dirname(__FILE__) . '/layouts/isadmin.php'; ?>
 <?php
-    include dirname(__FILE__, 2).'/functions/report.php';
-    $report = new Report();
-    $rows = $report->index();
-
+include dirname(__FILE__, 2) . '/functions/report.php';
+$report = new Report();
+$rows = $report->index();
+foreach ($rows as $row) {
+  $title[] = $row['title'];
+  $rating[] = $row['rating'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +50,7 @@
 
       <!-- Main content -->
       <section class="content">
-        <div class="card">
+        <div class="card p-3">
           <div class="card-header border-0">
             <h3 class="card-title">High Categories History Report</h3>
             <div class="card-tools">
@@ -59,31 +62,24 @@
               </a>
             </div>
           </div>
-          <div class="card-body table-responsive p-0">
-            <table class="table table-striped table-valign-middle">
-              <thead>
-                <tr>
-                  <th>No.</th>
-                  <th>Product</th>
-                  <th>Rating</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php $i=0; foreach($rows as $row) { ?>
-                <tr>
-                  <td><?= ++$i ?></td>
-                  <td><?= $row['title'] ?></td>
-                  <td>
-                    <small class="<?= $row['rating'] == 0? 'text-warning': 'text-success' ?> mr-1">
-                      <i class="<?= $row['rating'] == 0? 'fas fa-arrow-down': 'fas fa-arrow-up' ?>"></i>
-                      <?= $row['rating'] * count($rows) /100 ?>%
-                    </small>
-                    <?= $row['rating'] ?>
-                  </td>
-                </tr>
-                <?php  } ?>
-              </tbody>
-            </table>
+          <div class="card-body  p-0">
+            <div class="row">
+              <div class="col-md-6">
+                <canvas id="myChart" width="100" height="100"></canvas>
+              </div>
+              <div class="col-md-6">
+                <h3 class="text-muted">Categories List</h3>
+                <?php foreach($rows as $row) {?>
+                <div class="info-box mb-3">
+                  <span class="info-box-icon bg-primary elevation-1"><i class="fas fa-user"></i></span>
+                  <div class="info-box-content">
+                    <span class="info-box-text"><?= $row['title'] ?></span>
+                    <span class="info-box-number"><?= $row['rating'] ?></span>
+                  </div>
+                </div>
+                <?php } ?>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -95,7 +91,33 @@
   <!-- ./wrapper -->
 
   <?php include dirname(__FILE__) . '/layouts/script.php' ?>
-  
+  <script>
+    const labels = <?php echo json_encode($title) ?>;
+    const rating = <?php echo json_encode($rating) ?>;
+    const ctx = document.getElementById('myChart');
+    const myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'rating',
+          data: rating,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
+
 </body>
 
 </html>

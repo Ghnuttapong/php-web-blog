@@ -18,10 +18,12 @@ if (isset($_POST['article-btn-update'])) {
         if (move_uploaded_file($_FILES['article-input-picture']['tmp_name'], "./images/article/$filename")) {
             $article->updateArticle($title, $detail, $category_id, $filename, $id);
             $msg_suc = 'updated successfully.';
+            header('Location: view.php');
         }
     } else {
         if ($article->updateArticle($title, $detail, $category_id, null, $id)) {
             $msg_suc = 'updated successfully.';
+            header('Location: view.php');
         }
     }
     $msg_err = 'Failed updated.';
