@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.4deb2+deb11u1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Oct 03, 2022 at 09:41 AM
--- Server version: 10.5.15-MariaDB-0+deb11u1
--- PHP Version: 7.4.30
+-- Host: 127.0.0.1
+-- Generation Time: Oct 03, 2022 at 12:13 PM
+-- Server version: 10.4.24-MariaDB
+-- PHP Version: 8.1.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -83,6 +83,7 @@ CREATE TABLE `users` (
   `password` varchar(200) NOT NULL,
   `fullname` varchar(200) NOT NULL,
   `enabled` varchar(50) NOT NULL,
+  `picture` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -90,9 +91,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `fullname`, `enabled`, `created_at`) VALUES
-(1, 'admin', '1234', 'admin', 'false', '2022-08-29 13:29:18'),
-(2, 'admin', '81dc9bdb52d04dc20036dbd8313ed055', 'nuttapong', 'true', '2022-08-30 13:46:45');
+INSERT INTO `users` (`id`, `username`, `password`, `fullname`, `enabled`, `picture`, `created_at`) VALUES
+(1, 'admin', '81dc9bdb52d04dc20036dbd8313ed055', 'admin', 'false', '202210031157.png', '2022-08-29 13:29:18'),
+(2, 'admin', '81dc9bdb52d04dc20036dbd8313ed055', 'nuttapong', 'true', '202210031157.png', '2022-08-30 13:46:45');
 
 --
 -- Indexes for dumped tables
